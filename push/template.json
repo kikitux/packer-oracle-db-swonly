@@ -1,0 +1,76 @@
+{
+    "push": {
+      "name": "anthshor/ol6-oracledb"
+    },
+  "variables": {
+    "atlas_username": "anthshor",
+    "atlas_name": "ol6-oracledb",
+	  "iso_url": "http://mirror.aarnet.edu.au/pub/oraclelinux/OL6/U6/x86_64/OracleLinux-R6-U6-Server-x86_64-dvd.iso",
+	  "iso_checksum": "5738f10a506d3630edfd297ef179b553091c6a48",
+    "output": "virtualbox/ol6-oracledb.box",
+    "ssh_username": "root",
+    "ssh_password": "Welcome1"
+  },
+  "builders": [{
+    "name": "virtualbox",
+    "type": "virtualbox-iso",
+    "guest_os_type": "Oracle_64",
+    "guest_additions_url": "",
+    "guest_additions_sha256": "",
+    "guest_additions_path": "",
+    "guest_additions_mode": "upload",
+    "iso_url": "{{user `iso_url`}}",
+    "iso_checksum": "{{user `iso_checksum`}}",
+    "http_directory": "ol6_http",
+    "iso_checksum_type": "sha1",
+    "disk_size": 46000,
+    "iso_interface": "sata",
+    "hard_drive_interface": "sata",
+    "ssh_username": "{{user `ssh_username`}}",
+    "ssh_password": "{{user `ssh_password`}}",
+    "ssh_wait_timeout": "20m",
+    "shutdown_timeout": "30m",	  
+    "shutdown_command": "shutdown -P now",
+    "vboxmanage_post": [
+           ["storagectl", "{{.Name}}", "--name", "IDE Controller", "--remove"]
+        ],
+    "boot_command":	[
+				"<wait><esc>",
+				"<wait> linux text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks.cfg",
+				"<enter>"
+		],
+    "headless": true
+  }],
+  "provisioners": [
+    {
+      "type": "file",
+      "source": "oracle-ee-12102/",
+      "destination": "/var/tmp"
+    },
+    {
+      "type": "shell",
+      "execute_command": "sh '{{ .Path }}'",
+      "pause_before": "1s",
+      "scripts": [
+        "scripts/base.sh",
+        "scripts/prereqs.sh"
+        ]
+    }
+  ], 
+  "post-processors": [
+         [{
+          "type": "vagrant",
+          "keep_input_artifact": false
+         },
+        {
+            "type": "atlas",
+            "artifact": "{{user `atlas_username`}}/{{user `atlas_name`}}",
+            "artifact_type": "vagrant.box",
+            "metadata": {
+                "provider": "virtualbox",
+                "version": "0.0.2"
+            }
+        }
+    ]
+  ]
+}
