@@ -1,7 +1,7 @@
 {
-    "push": {
-      "name": "anthshor/ol6-oracledb"
-    },
+  "push": {
+    "name": "anthshor/ol6-oracledb"
+  },
   "variables": {
     "atlas_username": "anthshor",
     "atlas_name": "ol6-oracledb",
@@ -64,7 +64,7 @@
          },
         {
             "type": "atlas",
-            "artifact": "{{user `atlas_username`}}/{{user `atlas_name`}}",
+            "artifact": "{{user `app_slug` }}",
             "artifact_type": "vagrant.box",
             "metadata": {
               "provider": "virtualbox",
